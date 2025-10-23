@@ -25,6 +25,7 @@ __license__ = "GNU General Public License Version 3"
 
 
 import functools
+import logging
 import socket
 import sys
 import time
@@ -48,6 +49,7 @@ from quart import request
 from quart.templating import stream_template
 from quart_auth import (
     AuthUser,
+    QuartAuth,
     Unauthorized,
     current_user,
     login_required,
@@ -61,7 +63,6 @@ from imtrackerweb import (
     csvrecords,
     database,
     elapsed,
-    logger,
     security,
 )
 
@@ -88,23 +89,12 @@ CONFIG_PATH: Final = XDG_CONFIG_HOME / FILE_TITLE
 DATA_PATH: Final = XDG_DATA_HOME / FILE_TITLE
 MAIN_CONFIG: Final = CONFIG_PATH / "config.toml"
 
-# For some reason error class is not exposed nicely; Let's fix that
-logger.set_title(__title__)
-
+FORMAT = "[%(asctime)s] [%(levelname)s] %(message)s"
+logging.basicConfig(format=FORMAT, level=logging.DEBUG, force=True)
 
 PEPPER = "TODO: Load from configuration file"
 
 T = TypeVar("T")
-
-
-class FakeLog:
-    """Fake log."""
-
-    error = print
-    info = print
-
-
-logging = FakeLog()
 
 
 def combine_end(data: Iterable[str], final: str = "and") -> str:
@@ -1235,8 +1225,7 @@ async def stable_ws_discovery_endpoint() -> Response:
 
 async def serve_async(app: QuartTrio, config_obj: Config) -> None:
     """Serve app within a nursery."""
-    async with trio.open_nursery(strict_exception_groups=True) as nursery:
-        await nursery.start(serve, app, config_obj)
+    await serve(app, config_obj)
 
 
 def serve_scanner(
@@ -1328,6 +1317,8 @@ def serve_scanner(
 
         config_obj = Config.from_mapping(config)
 
+        QuartAuth(app)
+
         print("(CTRL + C to quit)")
 
         trio.run(serve_async, app, config_obj)
@@ -1397,13 +1388,16 @@ use_reloader = false
     if "--local" in sys.argv[1:]:
         ip_address = "127.0.0.1"
 
-    serve_scanner(
-        target,
-        secure_bind_port=secure_bind_port,
-        insecure_bind_port=insecure_bind_port,
-        ip_addr=ip_address,
-        hypercorn=hypercorn,
-    )
+    try:
+        serve_scanner(
+            target,
+            secure_bind_port=secure_bind_port,
+            insecure_bind_port=insecure_bind_port,
+            ip_addr=ip_address,
+            hypercorn=hypercorn,
+        )
+    finally:
+        database.unload_all()
 
 
 if __name__ == "__main__":
