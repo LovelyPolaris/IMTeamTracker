@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Created New Account!</title>
+    <link rel="stylesheet" type="text/css" href="/style.css">
+  </head>
+  <body>
+    <div class="content">
+      <h1>Created New Account!</h1>
+      <p>Created new account with login credentials:</p>
+      <div class="box">
+        Username: <code>{{ new_account_username }}</code>
+        <br>
+        Password: <code>{{ password }}</code>
+      </div>
+      <br>
+      <i>Password can be changed in settings later</i>
+      <br>
+      <br>
+      <strong>Please write this down, it will not be viewable again!</strong>
+      <br>
+      <br>
+      <p>Links:</p>
+      <ul>
+        <li><a href="/">Return to main page</a></li>
+        <li><a href="/logout">Log Out</a></li>
+        <li><a href="/settings">Account Settings</a></li>
+        <li><a href="/add-tickets">Add Tickets for Student</a></li>
+        <li><a href="/invite-teacher">Invite a Teacher</a></li>
+        <li><a href="/invite-manager">Invite Another Manager</a></li>
+      </ul>
+    </div>
+    <footer>
+      <i>If you're reading this, the web server was installed correctly.™</i>
+      <hr>
+      <p>Intramural Team Tracker Webserver v0.0.0 © CoolCat467</p>
+    </footer>
+  </body>
+</html>

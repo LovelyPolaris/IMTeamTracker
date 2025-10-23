@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ticket Count</title>
+    <link rel="stylesheet" type="text/css" href="/style.css">
+  </head>
+  <body>
+    <div class="content">
+      <h1>Ticket Count</h1>
+      <div class="box">
+        <h3>{{ username }} currently has {{ count }} tickets</h3>
+      </div>
+      <a href="{{ user_link }}">Link to this user</a>
+      <p>Links:</p>
+      <ul>
+        <li><a href="/tickets">Display tickets for user</a></li>
+        <li><a href="/">Return to main page</a></li>
+      </ul>
+      {% if user_type in ("teacher", "manager", "admin") %}
+      <ul>
+        <li><a href="/add-tickets">Add Tickets for Student</a></li>
+      </ul>
+      {% endif %}
+      {% if user_type in ("manager", "admin") %}
+      <ul>
+        <li><a href="/subtract-tickets">Subtract Tickets for Student</a></li>
+      </ul>
+      {% endif %}
+    </div>
+    <footer>
+      <i>If you're reading this, the web server was installed correctly.™</i>
+      <hr>
+      <p>Intramural Team Tracker Webserver v0.0.0 © CoolCat467</p>
+    </footer>
+  </body>
+</html>

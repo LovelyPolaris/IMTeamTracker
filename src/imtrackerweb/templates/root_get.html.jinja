@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Intramural Team Tracker</title>
+    <link rel="stylesheet" type="text/css" href="/style.css">
+  </head>
+  <body>
+    <div class="content">
+      <h1>Intramural Team Tracker</h1>
+      <div class="box">
+        {% if user_name == "" %}
+        <p>
+          Please log in at <a href="/login">this link</a>.
+        </p>
+        {% else %}
+        <p>
+          Hello logged in user {{ user_name }}.
+        </p>
+        {% endif %}
+      </div>
+      <p>Links:</p>
+      {% if user_name == "" %}
+      <ul>
+        <li><a href="/login">Log In</a></li>
+      </ul>
+      {% else %}
+      <ul>
+        <li><a href="/logout">Log Out</a></li>
+        <li><a href="/settings">Account Settings</a></li>
+        <li><a href="/tickets">View ticket count</a></li>
+      </ul>
+      {% if user_type in ("teacher", "manager", "admin") %}
+      <ul>
+        <li><a href="/add-tickets">Add Tickets for Student</a></li>
+      </ul>
+      {% endif %}
+      {% if user_type in ("manager", "admin") %}
+      <ul>
+        <li><a href="/subtract-tickets">Subtract Tickets for Student</a></li>
+      </ul>
+      {% endif %}
+      {% if user_type in ("admin") %}
+      <ul>
+        <li><a href="/invite-teacher">Invite Teacher</a></li>
+        <li><a href="/invite-manager">Invite Manager</a></li>
+      </ul>
+      {% endif %}
+      {% endif %}
+    </div>
+    <footer>
+      <i>If you're reading this, the web server was installed correctly.™</i>
+      <hr>
+      <p>Intramural Team Tracker Webserver v0.0.0 © CoolCat467</p>
+    </footer>
+  </body>
+</html>
