@@ -1,0 +1,41 @@
+Intramural-Team-Tracker
+
+[User] Login Page
+unk.edu domains
+email + password
+accept waver
+
+[User] Home Page
+select: settings, move teams, go to team
+clubs
+intramurals
+admin: member management, participation stats
+
+[User] Profile
+name
+language
+contact Email
+sex
+change Password
+sorority / frat
+
+[Manager] Team Creator
+one team created / joined per user, per sport
+different capacity of team per sport
+amount requirement per team at a deadline
+
+[Manager] Bracket Creator
+one team created / joined per user, per sport
+different capacity of team per sport
+amount requirement per team at a deadline
+
+[Admin] Admin Panel
+import fusion files
+print score sheets
+move teams / games / players
+active game stats
+
+[User] Settings
+change: email, password
+profile details
+waver copy

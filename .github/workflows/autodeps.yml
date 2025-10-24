@@ -30,7 +30,6 @@ jobs:
 
       - name: Bump dependencies
         run: |
-          sudo apt-get update && sudo apt-get install -y libsane-dev
           python -m pip install -U uv
           uv lock --upgrade
           uv tool install pre-commit
