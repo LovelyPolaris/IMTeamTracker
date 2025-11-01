@@ -7,7 +7,7 @@ on:
 
 jobs:
   Autodeps:
-    if: github.repository_owner == 'CoolCat467'
+    if: github.repository_owner == 'LovelyPolaris'
     name: Autodeps
     timeout-minutes: 10
     runs-on: 'ubuntu-latest'
