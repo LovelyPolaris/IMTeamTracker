@@ -1205,24 +1205,6 @@ async def root_get() -> AsyncIterator[str] | Response:
     )
 
 
-@app.post(
-    "/StableWSDiscoveryEndpoint/schemas-xmlsoap-org_ws_2005_04_discovery",
-)
-async def stable_ws_discovery_endpoint() -> Response:
-    """Handle stable_ws_discovery_endpoint POST."""
-    data = await request.data
-    print(f"StableWSDiscoveryEndpoint {data = }")
-
-    args = request.args
-    print(f"StableWSDiscoveryEndpoint URL {args = }")
-
-    multi_dict = await request.form
-    form_dict = multi_dict.to_dict()
-
-    print(f"StableWSDiscoveryEndpoint POST {form_dict = }")
-    return app.redirect("/")
-
-
 async def serve_async(app: QuartTrio, config_obj: Config) -> None:
     """Serve app within a nursery."""
     await serve(app, config_obj)
