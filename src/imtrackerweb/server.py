@@ -25,6 +25,7 @@ __license__ = "GNU General Public License Version 3"
 
 
 import functools
+import json
 import logging
 import socket
 import sys
@@ -57,12 +58,14 @@ from quart_auth import (
     logout_user,
 )
 from quart_trio import QuartTrio
+from werkzeug import Response
 from werkzeug.exceptions import HTTPException
 
 from imtrackerweb import (
     csvrecords,
     database,
     elapsed,
+    htmlgen,
     security,
 )
 
@@ -74,7 +77,6 @@ else:
 
 if TYPE_CHECKING:
     from typing_extensions import ParamSpec
-    from werkzeug import Response
 
     PS = ParamSpec("PS")
 
@@ -497,119 +499,120 @@ def convert_joining(code: str) -> bool:
     return True
 
 
-# @app.get("/signup")
-# async def signup_get() -> str | Response:
-#    """Handle sign up get including code register"""
-#    # Get code from request arguments if it exists
-#    code = request.args.get("code", None)
-#    if code is not None:
-#        success = convert_joining(code)
-#        if success:
-#            return app.redirect("/")
-#        return await send_error(
-#            "Signup Code Error",
-#            "Signup code is invalid. It may have expired.",
-#            request.url
-#        )
-#    return await stream_template(
-#        "signup_get.html.jinja",
-#    )
+@app.get("/signup")
+async def signup_get() -> str | Response:
+    """Handle sign up get including code register."""
+    # Get code from request arguments if it exists
+    code = request.args.get("code", None)
+    if code is not None:
+        success = convert_joining(code)
+        if success:
+            return app.redirect("/")
+        return await send_error(
+            "Signup Code Error",
+            "Signup code is invalid. It may have expired.",
+            request.url,
+        )
+    return await stream_template(
+        "signup_get.html.jinja",
+    )
 
 
-# @app.post("/signup")
-# async def signup_post() -> Response | str:
-#    """Handle sign up form"""
-#    multi_dict = await request.form
-#    response = multi_dict.to_dict()
-#
-#    # Validate response
-#    username = response.get("username", "")
-#    password = response.get("password", "")
-#
-#    if bool(set(username) - set("0123456789")) or len(username) != 6:
-#        return await send_error(
-#            "Signup Error",
-#            "Student usernames can only be numbers and must be exactly 6 "+
-#            "digits long.",
-#            request.url
-#        )
-#    if len(set(password)) < 7:
-#        return await send_error(
-#            "Signup Error",
-#            "Password must have at least seven different characters "+
-#            "for security reasons. Please use a more secure password.",
-#            request.url
-#        )
-#
-#    users = database.load(Path(app.root_path) / "records" / "users.json")
-#
-#    create_link = True
-#
-#    if username in users:
-#        status = users[username].get("status", "not_created")
-#        if status == "created":
-#            return await send_error(
-#                "Signup Error",
-#                "A user with the requested username already exists",
-#                request.url
-#            )
-#        if status == "joining":
-#            now = int(time.time())
-#            if users[username].get("join_code_expires", now + 5) < now:
-#                create_link = False
-#
-#    # If not already in joining list, add and send code
-#    email = f"{username}@class.lps.org"
-#
-#    if create_link:
-#        table = users.table("username")
-#        existing_codes = table["join_code"]
-#        while (code := str(uuid.uuid4())) in existing_codes:
-#            continue
-#        link = (
-#            app.url_for("signup_get", _external=True)
-#            + "?"
-#            + urlencode({"code": code})
-#        )
-#        expires = int(time.time()) + 10 * 60  # Expires in 10 minutes
-#
-#        expire_time = elapsed.get_elapsed(expires - int(time.time()))
-#        title = "Please Verify Your Account"
-#        message_body = "\n".join(
-#            (
-#                "There was a request to create a new account for the",
-#                f"Caught In the Act Store with the username {username!r}.",
-#                f"Please click {htmlgen.create_link(link, 'this link')}",
-#                "to verify your account.",
-#                "",
-#                "If you did not request to make an account, please ignore",
-#                f"this message. This link will expire in {expire_time}.",
-#            )
-#        )
-#        sendmail.send(email, title, message_body)
-#
-#        if username not in users:
-#            create_uninitialized_account(username)
-#
-#        users[username].update(
-#            {
-#                "password": security.create_new_login_credentials(
-#                    password, PEPPER
-#                ),
-#                "email": users[username].get("email", email),
-#                "type": users[username].get("type", "student"),
-#                "status": "joining",
-#                "join_code": code,
-#                "join_code_expires": expires,
-#            }
-#        )
-#        users.write_file()
-#        logging.info(f"User {username!r} signed up")
-#
-#    return await stream_template(
-#        "signup_post.html.jinja",
-#        email=email,
-#    )
+@app.post("/signup")
+async def signup_post() -> Response | str:
+    """Handle sign up form."""
+    multi_dict = await request.form
+    response = multi_dict.to_dict()
+
+    # Validate response
+    username = response.get("username", "")
+    password = response.get("password", "")
+
+    if bool(set(username) - set("0123456789")) or len(username) != 6:
+        return await send_error(
+            "Signup Error",
+            "Student usernames can only be numbers and must be exactly 6 "
+            + "digits long.",
+            request.url,
+        )
+    if len(set(password)) < 7:
+        return await send_error(
+            "Signup Error",
+            "Password must have at least seven different characters "
+            + "for security reasons. Please use a more secure password.",
+            request.url,
+        )
+
+    users = database.load(Path(app.root_path) / "records" / "users.json")
+
+    create_link = True
+
+    if username in users:
+        status = users[username].get("status", "not_created")
+        if status == "created":
+            return await send_error(
+                "Signup Error",
+                "A user with the requested username already exists",
+                request.url,
+            )
+        if status == "joining":
+            now = int(time.time())
+            if users[username].get("join_code_expires", now + 5) < now:
+                create_link = False
+
+    # If not already in joining list, add and send code
+    email = f"{username}@class.lps.org"
+
+    if create_link:
+        table = users.table("username")
+        existing_codes = table["join_code"]
+        while (code := str(uuid.uuid4())) in existing_codes:
+            continue
+        link = (
+            app.url_for("signup_get", _external=True)
+            + "?"
+            + urlencode({"code": code})
+        )
+        expires = int(time.time()) + 10 * 60  # Expires in 10 minutes
+
+        expire_time = elapsed.get_elapsed(expires - int(time.time()))
+        title = "Please Verify Your Account"
+        message_body = "\n".join(
+            (
+                "There was a request to create a new account for the",
+                f"Caught In the Act Store with the username {username!r}.",
+                f"Please click {htmlgen.create_link(link, 'this link')}",
+                "to verify your account.",
+                "",
+                "If you did not request to make an account, please ignore",
+                f"this message. This link will expire in {expire_time}.",
+            ),
+        )
+        print("Send email", email, title, message_body)
+
+        if username not in users:
+            create_uninitialized_account(username)
+
+        users[username].update(
+            {
+                "password": security.create_new_login_credentials(
+                    password,
+                    PEPPER,
+                ),
+                "email": users[username].get("email", email),
+                "type": users[username].get("type", "student"),
+                "status": "joining",
+                "join_code": code,
+                "join_code_expires": expires,
+            },
+        )
+        users.write_file()
+        logging.info(f"User {username!r} signed up")
+
+    return await stream_template(
+        "signup_post.html.jinja",
+        email=email,
+    )
 
 
 @app.get("/login")
@@ -697,29 +700,30 @@ async def logout() -> Response:
     return app.redirect("login")
 
 
-# @app.get("/user_data")
-# @login_required
-# async def user_data_route() -> Response | Response:
-#    """Dump user data
-#
-#    Warning, potential security issue, do not run in production"""
-#    assert current_user.auth_id is not None
-#    users = database.load(Path(app.root_path) / "records" / "users.json")
-#    username = get_login_from_cookie_data(current_user.auth_id)
-#
-#    if username is None or username not in users:
-#        logging.error(
-#            f"Invalid login UUID {current_user.auth_id} "
-#            "in authenticated user",
-#        )
-#        logout_user()
-#        return app.redirect("login")
-#    user = users[username] | {"username": username}
-#    logging.debug(f"Record dump for {username!r}")
-#    return Response(
-#        json.dumps(user, sort_keys=True),
-#        content_type="application/json",
-#    )
+@app.get("/user_data")
+@login_required
+async def user_data_route() -> Response:
+    """Dump user data.
+
+    Warning, potential security issue, do not run in production
+    """
+    assert current_user.auth_id is not None
+    users = database.load(Path(app.root_path) / "records" / "users.json")
+    username = get_login_from_cookie_data(current_user.auth_id)
+
+    if username is None or username not in users:
+        logging.error(
+            f"Invalid login UUID {current_user.auth_id} "
+            "in authenticated user",
+        )
+        logout_user()
+        return app.redirect("login")
+    user = users[username] | {"username": username}
+    logging.debug(f"Record dump for {username!r}")
+    return Response(
+        json.dumps(user, sort_keys=True),
+        content_type="application/json",
+    )
 
 
 @app.get("/add-tickets")

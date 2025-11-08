@@ -1,3 +1,6 @@
+# Records
+**/records/**
+
 # Temp file during Mypy processing
 mypy_annotate.dat
 test-results.xml
