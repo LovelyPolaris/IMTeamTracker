@@ -18,17 +18,14 @@ repos:
       - id: check-case-conflict
       - id: sort-simple-yaml
         files: .pre-commit-config.yaml
-  - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 25.9.0
-    hooks:
-      - id: black
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.13.3
+    rev: v0.14.4
     hooks:
       - id: ruff-check
         types: [file]
         types_or: [python, pyi, toml]
         args: ["--show-fixes"]
+      - id: ruff-format
   - repo: https://github.com/CoolCat467/badgie
     rev: v0.9.6
     hooks:
@@ -40,11 +37,11 @@ repos:
         additional_dependencies:
           - tomli
   - repo: https://github.com/adhtruong/mirrors-typos
-    rev: v1.37.2
+    rev: v1.39.0
     hooks:
       - id: typos
   - repo: https://github.com/woodruffw/zizmor-pre-commit
-    rev: v1.14.2
+    rev: v1.16.3
     hooks:
       - id: zizmor
   - repo: local

@@ -713,8 +713,7 @@ async def user_data_route() -> Response:
 
     if username is None or username not in users:
         logging.error(
-            f"Invalid login UUID {current_user.auth_id} "
-            "in authenticated user",
+            f"Invalid login UUID {current_user.auth_id} in authenticated user",
         )
         logout_user()
         return app.redirect("login")
@@ -866,8 +865,7 @@ async def settings_password_post() -> AsyncIterator[str] | Response:
 
     if username is None or username not in users:
         logging.error(
-            f"Invalid login UUID {current_user.auth_id} "
-            "in authenticated user",
+            f"Invalid login UUID {current_user.auth_id} in authenticated user",
         )
         logout_user()
         return app.redirect("login")
@@ -941,8 +939,7 @@ async def invite_teacher_post() -> AsyncIterator[str] | Response:
 
     if creator_username is None or creator_username not in users:
         logging.error(
-            f"Invalid login UUID {current_user.auth_id} "
-            "in authenticated user",
+            f"Invalid login UUID {current_user.auth_id} in authenticated user",
         )
         logout_user()
         return app.redirect("login")
@@ -1031,8 +1028,7 @@ async def invite_manager_post() -> AsyncIterator[str] | Response:
 
     if creator_username is None or creator_username not in users:
         logging.error(
-            f"Invalid login UUID {current_user.auth_id} "
-            "in authenticated user",
+            f"Invalid login UUID {current_user.auth_id} in authenticated user",
         )
         logout_user()
         return app.redirect("login")
