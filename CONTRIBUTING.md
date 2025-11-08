@@ -249,3 +249,11 @@ need to do. Sometimes that task might be "figure out what to do here", or even
 "figure out whether we want to address this issue"; sometimes it will be
 "answer this person's question". But if there's no followup to be done, then
 the issue should be closed.
+
+
+Resources
+---------------
+- [Jinja Templating Engine Docs](https://jinja.palletsprojects.com/en/latest/templates)
+```python
+help(imtrackerweb.htmlgen)
+```
