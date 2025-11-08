@@ -500,7 +500,7 @@ def convert_joining(code: str) -> bool:
 
 
 @app.get("/signup")
-async def signup_get() -> str | Response:
+async def signup_get() -> AsyncIterator[str] | Response:
     """Handle sign up get including code register."""
     # Get code from request arguments if it exists
     code = request.args.get("code", None)
@@ -519,7 +519,7 @@ async def signup_get() -> str | Response:
 
 
 @app.post("/signup")
-async def signup_post() -> Response | str:
+async def signup_post() -> AsyncIterator[str] | Response | str:
     """Handle sign up form."""
     multi_dict = await request.form
     response = multi_dict.to_dict()
@@ -1134,7 +1134,7 @@ async def ticket_count_page(username: str) -> AsyncIterator[str]:
 
 @app.get("/tickets")
 @pretty_exception
-async def tickets_get() -> AsyncIterator[str]:
+async def tickets_get() -> AsyncIterator[str] | tuple[AsyncIterator[str], int]:
     """Tickets view page."""
     # Get username from request arguments if it exists
     username = request.args.get("id", None)
@@ -1155,7 +1155,9 @@ async def tickets_get() -> AsyncIterator[str]:
 
 @app.post("/tickets")
 @pretty_exception
-async def tickets_post() -> AsyncIterator[str]:
+async def tickets_post() -> (
+    AsyncIterator[str] | tuple[AsyncIterator[str], int]
+):
     """Invite teacher form post handling."""
     multi_dict = await request.form
     response = multi_dict.to_dict()
